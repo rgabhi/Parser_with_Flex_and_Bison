@@ -1,4 +1,5 @@
 %option noyywrap
+%option yylineno
 
 %{
 #include <stdio.h>
@@ -8,45 +9,51 @@
 #include "parser.tab.h" // will generate with bison later
 %}
 
-
 %%
-
     //keywords 
-"var" { return VAR; }
-"if" { return IF; }
-"else" { return ELSE; }
+"var"   { return VAR; }
+"if"    { return IF; }
+"else"  { return ELSE; }
 "while" { return WHILE; }
+"for"   { return FOR; }
 
     /*operators*/
-"==" { return EQ; }
-"!=" { return NEQ; }
-"<" { return LT; }
-">" { return GT; }
-"<=" { return LE; }
-">=" { return GE; }
+"=="    { return EQ; }
+"!="    { return NEQ; }
+"<"     { return LT; }
+">"     { return GT; }
+"<="    { return LE; }
+">="    { return GE; }
 
     /*single char symbols*/
-"+" { return PLUS; }
-"-" { return MINUS; }
-"*" { return MULT; }
-"/" { return DIV; }
-"=" { return ASSIGN; }
-";" { return SEMI; }
-"(" { return LPAREN; }
-")" { return RPAREN; }
-"{" { return LBRACE; }
-"}" { return RBRACE; }
+"+"     { return PLUS; }
+"-"     { return MINUS; }
+"*"     { return MULT; }
+"/"     { return DIV; }
+"="     { return ASSIGN; }
+";"     { return SEMI; }
+"("     { return LPAREN; }
+")"     { return RPAREN; }
+"{"     { return LBRACE; }
+"}"     { return RBRACE; }
 
 [0-9]+ { 
     yylval.intValue = atoi(yytext); // convert to int 
-    return INTEGER; }
+    return INTEGER; 
+}
+
 [a-zA-Z][a-zA-Z0-9]* { 
     yylval.idName = strdup(yytext);
-    return IDENTIFIER; }
+    return IDENTIFIER; 
+}
 
-"//".* {/* Igonre comments */}
-[ \t\n]+ {}
+"//".* {/* Ignore comments */}
 
-. { printf("Unknown character: %s\n", yytext); exit(1); }
+[ \t\n]+ {/* Ignore whitespace */}
+
+. { 
+    fprintf(stderr, "Lexical Error: Unknown character '%s' at line %d\n", yytext, yylineno); 
+    exit(1); 
+}
 
 %%
