@@ -7,6 +7,7 @@
 void yyerror(const char *s);
 int yylex(void);
 extern int yylineno;
+extern FILE *yyin; // file ptr used by flex
 
 ASTNode *root; // global var to hold root of tree
 
@@ -266,10 +267,19 @@ primary:
 
 /* User Code */
 void yyerror(const char *s){
-    fprintf(stderr, "Syntax Error: %s\n", s);
+    fprintf(stderr, "Error on line %d: %s\n", yylineno, s);
 }
 
-int main(){
+int main(int argc, char **argv){
+    // Check if a filename was provided
+    if (argc > 1) {
+        FILE *file = fopen(argv[1], "r");
+        if (!file) {
+            fprintf(stderr, "Error: Could not open file %s\n", argv[1]);
+            return 1;
+        }
+        yyin = file; // Tell Flex to read from this file
+    }
     printf("Enter code (Ctrl+D to finish):\n");
     if(yyparse() == 0){
         printf("\nParsing Successful!\n");
