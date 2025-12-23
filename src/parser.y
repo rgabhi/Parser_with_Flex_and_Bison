@@ -73,7 +73,7 @@ void checkVarUsage(const char* name) {
 %type <node> program statement_list statement
 %type <node> variable_decl assignment assignment_no_semi block if_statement while_statement for_statement
 %type <node> for_init for_update
-%type <node> expression additive_expression term factor
+%type <node> expression equality comparison term factor unary primary
 
 /*"If you see an IF statement and the next token is ELSE, 
 compare their strengths. Since we defined %nonassoc ELSE 
@@ -221,35 +221,44 @@ for_statement:
 /*--------------*/ 
 /*sits on top of additive_expression*/ 
 expression:
-    additive_expression {$$ = $1; }
-    | expression EQ additive_expression { $$ = createBinOpNode(OP_EQ, $1, $3); }
-    | expression NEQ additive_expression { $$ = createBinOpNode(OP_NEQ, $1, $3); }
-    | expression LT additive_expression { $$ = createBinOpNode(OP_LT, $1, $3); }
-    | expression GT additive_expression { $$ = createBinOpNode(OP_GT, $1, $3); }
-    | expression LE additive_expression { $$ = createBinOpNode(OP_LE, $1, $3); }
-    | expression GE additive_expression { $$ = createBinOpNode(OP_GE, $1, $3); }
+    equality { $$ = $1; }
     ;
 
-/*sits on top of term*/ 
-additive_expression:
+equality:
+    comparison { $$ = $1; }
+    | equality EQ comparison  { $$ = createBinOpNode(OP_EQ, $1, $3); }
+    | equality NEQ comparison { $$ = createBinOpNode(OP_NEQ, $1, $3); }
+    ;
+
+comparison:
     term { $$ = $1; }
-    | additive_expression PLUS term { $$ = createBinOpNode(OP_PLUS, $1, $3); }
-    | additive_expression MINUS term { $$ = createBinOpNode(OP_MINUS, $1, $3); }
+    | comparison LT term { $$ = createBinOpNode(OP_LT, $1, $3); }
+    | comparison GT term { $$ = createBinOpNode(OP_GT, $1, $3); }
+    | comparison LE term { $$ = createBinOpNode(OP_LE, $1, $3); }
+    | comparison GE term { $$ = createBinOpNode(OP_GE, $1, $3); }
     ;
 
-/**/ 
 term:
     factor { $$ = $1; }
-    | term MULT factor { $$ = createBinOpNode(OP_MULT, $1, $3); }
-    | term DIV factor { $$ = createBinOpNode(OP_DIV, $1, $3); }
-    ; 
+    | term PLUS factor  { $$ = createBinOpNode(OP_PLUS, $1, $3); }
+    | term MINUS factor { $$ = createBinOpNode(OP_MINUS, $1, $3); }
+    ;
 
 factor:
+    unary { $$ = $1; }
+    | factor MULT unary { $$ = createBinOpNode(OP_MULT, $1, $3); }
+    | factor DIV unary  { $$ = createBinOpNode(OP_DIV, $1, $3); }
+    ;
+
+unary:
+    primary { $$ = $1; }
+    | MINUS unary { $$ = createUnaryNode(OP_NEG, $2); } /* Handles -5 or -x */
+    | PLUS unary  { $$ = $2; } /* Unary plus does nothing */
+    ;
+
+primary:
     INTEGER { $$ = createIntNode($1); }
-    | IDENTIFIER { 
-        checkVarUsage($1);  // Check if variable is declared before use
-        $$ = createVarNode($1); 
-    }
+    | IDENTIFIER { $$ = createVarNode($1); }
     | LPAREN expression RPAREN { $$ = $2; }
     ;
 
