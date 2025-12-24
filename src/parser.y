@@ -296,7 +296,7 @@ int main(int argc, char **argv){
         }
         yyin = file; // Tell Flex to read from this file
     }
-    printf("Enter code (Ctrl+D to finish):\n");
+    //printf("Enter code (Ctrl+D to finish):\n");
     if(yyparse() == 0){
         printf("\nParsing Successful!\n");
         printf("\nAbstract Syntax Tree:\n");
