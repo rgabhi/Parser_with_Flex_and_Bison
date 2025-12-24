@@ -65,6 +65,13 @@ ASTNode *createBlockNode(ASTNode *statementList){
     return node;
 }
 
+ASTNode *createUnaryNode(OpType op, ASTNode *left){
+    ASTNode* node = createNode(NODE_UNARY);
+    node->data.op = op;
+    node->left = left;
+    return node;
+}
+
  //visualize
  void printAST(ASTNode *node, int level){
     if(!node)return;
@@ -80,6 +87,10 @@ ASTNode *createBlockNode(ASTNode *statementList){
             printf("Op: %d\n", node->data.op);
             printAST(node->left, level + 1);
             printAST(node->right, level + 1);
+            break;
+        case NODE_UNARY:
+            printf("Unary Op: %d\n", node->data.op);
+            printAST(node->left, level + 1);
             break;
         case NODE_ASSIGN:
             printf("Assign: %s\n", node->data.idName);

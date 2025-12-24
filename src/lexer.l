@@ -7,6 +7,8 @@
 #include <string.h> // for strdup
 #include "ast.h" // for ASTNode
 #include "parser.tab.h" // will generate with bison later
+
+//int yylineno = 1; // init line no
 %}
 
 %%
@@ -52,7 +54,7 @@
 [ \t\n]+ {/* Ignore whitespace */}
 
 . { 
-    fprintf(stderr, "Lexical Error: Unknown character '%s' at line %d\n", yytext, yylineno); 
+    fprintf(stderr, "Lexical Error: Unknown character on line %d: '%s'\n", yylineno, yytext); 
     exit(1); 
 }
 

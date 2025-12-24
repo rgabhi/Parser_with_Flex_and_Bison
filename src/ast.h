@@ -11,6 +11,7 @@ typedef enum {
     NODE_INT, // 5
     NODE_VAR, // x
     NODE_BIN_OP, // x + 5
+    NODE_UNARY, // | 
     NODE_ASSIGN, // x = ...
     NODE_VAR_DECL, // var x
     NODE_IF, // if
@@ -21,7 +22,8 @@ typedef enum {
 // define operators
 typedef enum {
     OP_PLUS, OP_MINUS, OP_MULT, OP_DIV,
-    OP_EQ, OP_NEQ, OP_LT, OP_GT, OP_LE, OP_GE
+    OP_EQ, OP_NEQ, OP_LT, OP_GT, OP_LE, OP_GE,
+    OP_NEG // for unary minus (-)
 } OpType;
 
 // Node Structure
@@ -46,6 +48,7 @@ typedef struct ASTNode {
 ASTNode* createIntNode(int value);
 ASTNode* createVarNode(char *name);
 ASTNode* createBinOpNode(OpType op, ASTNode *left, ASTNode *right);
+ASTNode* createUnaryNode(OpType op, ASTNode *left);
 ASTNode* createAssignNode(char *name, ASTNode *value);
 ASTNode* createVarDeclNode(char *name, ASTNode *initValue);
 ASTNode* createIfNode(ASTNode *cond, ASTNode *thenBranch, ASTNode *elseBranch);
