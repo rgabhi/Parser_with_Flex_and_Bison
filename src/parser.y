@@ -286,7 +286,7 @@ void yyerror(const char *s) {
 }
 
 
-nt main(int argc, char **argv){
+int main(int argc, char **argv){
     // Check if a filename was provided
     if (argc > 1) {
         FILE *file = fopen(argv[1], "r");
