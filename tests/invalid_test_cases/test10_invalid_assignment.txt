@@ -1,0 +1,4 @@
+// Test : Invalid assignment target 
+var x = 5;
+(x + 1) = 10;
+// Expected: Error at line 2: Invalid assignment target 

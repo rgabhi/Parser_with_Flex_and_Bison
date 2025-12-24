@@ -1,0 +1,4 @@
+// Variable declaration and initialization 
+var x;
+var y = 10;
+var z = 5 + 3 * 2;

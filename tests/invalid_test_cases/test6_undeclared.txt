@@ -1,0 +1,3 @@
+// Test : Use before declaration 
+x = 10; 
+// Expected: Semantic Error: undeclared variable 'x' 
