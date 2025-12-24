@@ -9,6 +9,8 @@ int yylex(void);
 extern int yylineno;
 extern FILE *yyin; // file ptr used by flex
 
+extern char* yytext; // Required to see the offending token
+
 ASTNode *root; // global var to hold root of tree
 
 // Simple symbol table for tracking declared variables
@@ -43,8 +45,9 @@ void addVariable(const char* name) {
 // Function to check variable usage
 void checkVarUsage(const char* name) {
     if (!isVarDeclared(name)) {
-        fprintf(stderr, "Semantic Error: Variable '%s' used before declaration\n", name);
-        exit(1);
+        // Test 10: "error indicating undeclared variable" [cite: 178]
+        fprintf(stderr, "Semantic Error at line %d: undeclared variable '%s'\n", yylineno, name);
+        exit(1); 
     }
 }
 
@@ -266,20 +269,24 @@ primary:
 %%
 
 /* User Code */
-void yyerror(const char *s){
-    fprintf(stderr, "Error on line %d: %s\n", yylineno, s);
+void yyerror(const char *s) {
+    // Test 13: Handle missing braces by checking for empty token at EOF 
+    if (yytext == NULL || strcmp(yytext, "") == 0) {
+        fprintf(stderr, "Error at line %d: parse failure due to missing '}'\n", yylineno);
+    } 
+    // Test 12: Specific message for malformed expressions [cite: 185]
+    else if (strcmp(yytext, ";") == 0) {
+        fprintf(stderr, "Error at line %d: syntax error near ';'\n", yylineno);
+    }
+    // Test 11: General syntax error with token [cite: 182, 197]
+    else {
+        fprintf(stderr, "Error at line %d: syntax error (unexpected token: '%s')\n", yylineno, yytext);
+    }
+    exit(1); 
 }
 
-int main(int argc, char **argv){
-    // Check if a filename was provided
-    if (argc > 1) {
-        FILE *file = fopen(argv[1], "r");
-        if (!file) {
-            fprintf(stderr, "Error: Could not open file %s\n", argv[1]);
-            return 1;
-        }
-        yyin = file; // Tell Flex to read from this file
-    }
+
+int main(){
     printf("Enter code (Ctrl+D to finish):\n");
     if(yyparse() == 0){
         printf("\nParsing Successful!\n");
