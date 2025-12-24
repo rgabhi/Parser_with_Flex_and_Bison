@@ -1,0 +1,3 @@
+// Test : Malformed expression 
+var x = 5 + ;
+// Expected: Error at line 1: syntax error near ';' 

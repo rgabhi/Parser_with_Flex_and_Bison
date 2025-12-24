@@ -1,0 +1,5 @@
+// Test : Unmatched braces 
+var x = 5;
+if (x > 0) {
+    x = x - 1;
+// Expected: Error at line 4: parse failure due to missing '}' 

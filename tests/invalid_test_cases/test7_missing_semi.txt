@@ -1,0 +1,4 @@
+// Test : Missing semicolon
+var x = 10
+x = 5;
+// Expected: Error at line 2: syntax error (unexpected token: 'x') 
